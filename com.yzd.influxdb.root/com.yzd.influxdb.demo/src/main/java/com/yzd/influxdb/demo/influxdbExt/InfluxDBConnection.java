@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * 版本一：
+ *
  * InfluxDB数据库连接操作类
  *
  * @author 大脑补丁
