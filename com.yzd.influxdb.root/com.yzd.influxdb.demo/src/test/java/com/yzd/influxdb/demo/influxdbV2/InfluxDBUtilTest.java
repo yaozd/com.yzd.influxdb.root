@@ -58,6 +58,12 @@ public class InfluxDBUtilTest {
         });
     }
 
+   /* *//**
+     * 批量插入
+     * 因使用阻塞队列take而产生大量线程驻留，导致内存溢出 问题
+     *
+     * @throws InterruptedException
+     *//*
     @Test
     @PerfTest(threads = 20, duration = 1000000)
     public void batchInsertByBlockingQueue() throws InterruptedException {
@@ -80,10 +86,17 @@ public class InfluxDBUtilTest {
         executorService.shutdown();
         executorService.awaitTermination(5, TimeUnit.SECONDS);
     }
+*/
 
+    /**
+     * 批量插入
+     * 目前推荐使用此方法-byArvin-20190321-1146
+     * 解决批量插入中因使用阻塞队列take而产生大量线程驻留问题
+     * @throws InterruptedException
+     */
     @Test
     @PerfTest(threads = 20, duration = 1000000)
-    public void batchInsertByBlockingQueue2() throws InterruptedException {
+    public void batchInsertByBlockingQueue2() {
         for (int i = 0; i < 200; i++) {
             //数据可以通过同步阻塞队列
             DataRepository.PRODUCT.putData(String.valueOf(i));
@@ -104,24 +117,27 @@ public class InfluxDBUtilTest {
      */
     private List<String> getBatchData() {
         List<String> data = new ArrayList<>();
-        ExecutorService executorService = Executors.newFixedThreadPool(1);
-        executorService.execute(() -> {
-            for (int i = 0; i < 1000; i++) {
-                String value = DataRepository.PRODUCT.takeData();
-                //数据可以通过同步阻塞队列或者是Redis的消息队列等
-                if (value == null) {
-                    continue;
+        boolean fristEmpty=true;
+        for (int i = 0; i < 250; i++) {
+            String value = DataRepository.PRODUCT.takeData();
+            //数据可以通过同步阻塞队列或者是Redis的消息队列等
+            //第一次读取不到数据，则直接等待1秒
+            if (value == null && fristEmpty) {
+                //log.info(null);
+                try {
+                    //通过休眠，代表等待1秒，执行时间最大为1秒。
+                    TimeUnit.SECONDS.sleep(1);
+                } catch (InterruptedException e) {
+                    //e.printStackTrace();
                 }
-                data.add(value);
+                fristEmpty=false;
+                continue;
             }
-        });
-        //解决线程驻留问题》executorService.shutdown();+executorService.awaitTermination(1,TimeUnit.SECONDS);
-        //如果没有执行shutdown就会出现线程驻留无法回收问题。
-        executorService.shutdown();
-        try {
-            executorService.awaitTermination(2, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+            //第二次读取不到数据，则直接返回
+            if(value==null&&!fristEmpty){
+                break;
+            }
+            data.add(value);
         }
         return data;
     }
