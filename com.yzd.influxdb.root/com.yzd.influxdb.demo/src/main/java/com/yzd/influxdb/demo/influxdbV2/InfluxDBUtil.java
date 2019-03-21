@@ -1,5 +1,6 @@
 package com.yzd.influxdb.demo.influxdbV2;
 
+import com.yzd.influxdb.demo.utils.okHttpClientExt.OkHttpClientUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.influxdb.InfluxDB;
 import org.influxdb.InfluxDBFactory;
@@ -55,7 +56,9 @@ public class InfluxDBUtil {
         InfluxDB influxDB = null;
         T t = null;
         try {
-            influxDB = InfluxDBFactory.connect(url, username, password);
+            //解决retrofit OKhttp创建大量对外连接时内存溢出:OkHttpClientUtil.generateBuilder()
+            influxDB = InfluxDBFactory.connect(url, username, password, OkHttpClientUtil.generateBuilder());
+            //influxDB = InfluxDBFactory.connect(url, username, password);
             influxDB.setDatabase(database);
             t = callback.doCallBack(database, influxDB);
         } catch (Exception e) {
