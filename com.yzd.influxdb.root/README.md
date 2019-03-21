@@ -2,6 +2,12 @@
 - V2-InfluxDBUtil(目前推荐此版本-byArvin-2019-03-20)
 - V1-InfluxDBConnection
 
+> 使用方法
+- 批量数据导入-InfluxDBUtil4BatchInsertTest.batchInsert()
+```
+
+```
+
 > 参考
 - [10.并发包阻塞队列之ArrayBlockingQueue](http://www.cnblogs.com/yulinfeng/p/6986975.html)
 ```
@@ -18,9 +24,9 @@ Java并发包中的阻塞队列一共7个，当然他们都是线程安全的。
 > 解决批量插入中因使用阻塞队列take而产生大量线程驻留问题
 - InfluxDBUtilTest.batchInsertByBlockingQueue2
 
-> 问题二：如何保证批量数据全部插入到数据库-addTage("pkg",i+"")
+> 问题二：如何保证批量数据全部插入到数据库-避免数据丢失-addTage("pkg",i+"")
 ```
-必须设置addTage("pkg",i+"")，才可以保证数据全部插入，否则数据会有遗漏
+批量数据导入必须设置addTage("pkg",i+"")，才可以保证数据全部插入，否则数据会有遗漏
 ```
 > 问题三：[解决retrofit OKhttp创建大量对外连接时内存溢出](https://blog.csdn.net/tianyaleixiaowu/article/details/78811488)
 ```

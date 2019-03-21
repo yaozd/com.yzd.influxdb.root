@@ -45,13 +45,13 @@ public class InfluxDBUtil4BatchInsertTest {
         });
     }
     @Test
-    //@PerfTest(threads = 20, duration = 1000000000)
-    @PerfTest(threads = 20,invocations = 10000000)
+    @PerfTest(threads = 20, duration = 1000000000)
+    //@PerfTest(threads = 20,invocations = 10000000)
     public void batchInsert(){
         for (int i = 0; i < 200; i++) {
             InfluxdbEntiy item= InfluxdbEntiy.build()
                     //pkg=保证批量数据全部插入到数据库
-                    //批量数据导入必须设置addTage("pkg",i+"")，才可以保证数据全部插入，否则数据会有遗漏
+                    //批量数据导入:必须设置addTage("pkg",i+"")，才可以保证数据全部插入，否则数据会有遗漏
                     .addTage("pkg",i+"")
                     .addTage("t1","t1")
                     .addTage("t2","t2")
