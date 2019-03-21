@@ -117,12 +117,12 @@ public class InfluxDBUtilTest {
      */
     private List<String> getBatchData() {
         List<String> data = new ArrayList<>();
-        boolean fristEmpty=true;
+        boolean firstEmpty=true;
         for (int i = 0; i < 250; i++) {
             String value = DataRepository.PRODUCT.takeData();
             //数据可以通过同步阻塞队列或者是Redis的消息队列等
             //第一次读取不到数据，则直接等待1秒
-            if (value == null && fristEmpty) {
+            if (value == null && firstEmpty) {
                 //log.info(null);
                 try {
                     //通过休眠，代表等待1秒，执行时间最大为1秒。
@@ -130,15 +130,16 @@ public class InfluxDBUtilTest {
                 } catch (InterruptedException e) {
                     //e.printStackTrace();
                 }
-                fristEmpty=false;
+                firstEmpty=false;
                 continue;
             }
             //第二次读取不到数据，则直接返回
-            if(value==null&&!fristEmpty){
+            if(value==null&&!firstEmpty){
                 break;
             }
             data.add(value);
         }
         return data;
     }
+
 }

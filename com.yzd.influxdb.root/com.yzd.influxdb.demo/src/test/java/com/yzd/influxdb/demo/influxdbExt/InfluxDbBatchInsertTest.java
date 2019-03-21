@@ -53,19 +53,21 @@ public class InfluxDbBatchInsertTest {
         }
     }
     //通过PerfTest制定并发线程数和invocations指定调用的次数。
-    @Test
+   /* @Test
     //@PerfTest(threads = 1,invocations=10000)
     @PerfTest(threads = 1,duration=1000000)
     public void readBatchData() throws InterruptedException {
         List<String> data=getBatchData();
        log.info("data.size()="+data.size());
     }
-    /**
+    *//**
      * 条件：执行时间最大为1秒或者读取1000条数据。
+     * 因使用阻塞队列take而产生大量线程驻留，导致内存溢出 问题
      * @return
-     */
+     *//*
     private List<String> getBatchData(){
         List<String> data=new ArrayList<>();
+        //因使用阻塞队列take而产生大量线程驻留，导致内存溢出 问题
         ExecutorService executorService = Executors.newFixedThreadPool(1);
         executorService.execute(() -> {
             for (int i = 0; i < 1000; i++) {
@@ -82,5 +84,5 @@ public class InfluxDbBatchInsertTest {
             e.printStackTrace();
         }
         return data;
-    }
+    }*/
 }

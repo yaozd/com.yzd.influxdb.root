@@ -16,4 +16,9 @@ Java并发包中的阻塞队列一共7个，当然他们都是线程安全的。
 ```
 >问题一：
 > 解决批量插入中因使用阻塞队列take而产生大量线程驻留问题
-- batchInsertByBlockingQueue2
+- InfluxDBUtilTest.batchInsertByBlockingQueue2
+
+> 如何保证批量数据全部插入到数据库-addTage("pkg",i+"")
+```
+必须设置addTage("pkg",i+"")，才可以保证数据全部插入，否则数据会有遗漏
+```
