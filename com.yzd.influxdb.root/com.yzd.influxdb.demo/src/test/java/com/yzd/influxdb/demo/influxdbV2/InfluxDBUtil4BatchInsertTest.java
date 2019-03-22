@@ -65,7 +65,7 @@ public class InfluxDBUtil4BatchInsertTest {
         List<String> data = DataRepository.PRODUCT.batchData(100,1);
         log.info("data size="+data.size());
         //转换数据
-        BatchPoints batchPoints = BatchPoints.database("db-test").build();
+        BatchPoints batchPoints = BatchPoints.builder().build();
         for (String itemJson:data) {
             InfluxdbEntiy item=FastJsonUtil.deserialize(itemJson,InfluxdbEntiy.class);
             batchPoints.point(InfluxdbEntiy.toPoint("tb-yzd",item));
