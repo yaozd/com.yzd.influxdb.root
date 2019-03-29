@@ -40,7 +40,7 @@ public class InfluxDBUtilTest {
                     .addField("num5", 1)
                     .addField("num6", 1)
                     .addField("num7", 1)
-                    .tag("pkg", i + "")
+                    .tag("pkg", DataRepository.PRODUCT.incrementAndGet() + "")
                     .tag("statusCode1", "statusCode11")
                     .tag("statusCode2", "statusCode2")
                     .tag("statusCode3", "statusCode3")
@@ -141,5 +141,98 @@ public class InfluxDBUtilTest {
         }
         return data;
     }
+
+    /**
+     * 通过字符进行数据插入
+     *
+     * @throws InterruptedException
+     */
+    @Test
+    //@PerfTest(threads = 20, duration = 1000000)
+    public void batchInsert_byStringValue() throws InterruptedException {
+        InfluxDBUtil.init("http://192.168.1.238:8086", "admin", "admin");
+        Point point = Point.measurement("cpu11")
+                .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
+                .addField("num0", 1)
+                .addField("num1", 1)
+                .addField("num2", 1)
+                .addField("num3", 1)
+                .addField("num4", 1)
+                .addField("num5", 1)
+                .addField("num6", 1)
+                .addField("num7", 1)
+                .tag("pkg",  "1")
+                .tag("statusCode1", "statusCode11")
+                .tag("statusCode2", "statusCode2")
+                .tag("statusCode3", "statusCode3")
+                .tag("statusCode4", "statusCode4")
+                .tag("statusCode5", "statusCode5")
+                .tag("statusCode6", "statusCode6")
+                .build();
+        String lineProtocol=point.lineProtocol();
+        InfluxDBUtil.batchInsert("db-test", new InfluxDBUtil.InfluxDBBatchInsertCallback() {
+            @Override
+            public void doCallBack(String database, InfluxDB influxDB) {
+                influxDB.write(lineProtocol);
+            }
+        });
+        List<String> lineProtocolList=new ArrayList<>();
+        lineProtocolList.add(lineProtocol);
+        InfluxDBUtil.batchInsert("db-test", new InfluxDBUtil.InfluxDBBatchInsertCallback() {
+            @Override
+            public void doCallBack(String database, InfluxDB influxDB) {
+                influxDB.write(lineProtocolList);
+            }
+        });
+    }
+    @Test
+    @PerfTest(threads = 20, invocations = 10)
+    public void batchInsert_byStringValue2() throws InterruptedException {
+        InfluxDBUtil.init("http://192.168.1.238:8086", "admin", "admin");
+        List<String> lineProtocolList=new ArrayList<>();
+        for (int j = 0; j < 100; j++) {
+            Point point = Point.measurement("cpu11")
+                    .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
+                    .addField("num0", 1)
+                    .addField("num1", 1)
+                    .addField("num2", 1)
+                    .addField("num3", 1)
+                    .addField("num4", 1)
+                    .addField("num5", 1)
+                    .addField("num6", 1)
+                    .addField("num7", 1)
+                    .tag("pkg",  DataRepository.PRODUCT.incrementAndGet()+"")
+                    .tag("statusCode1", "statusCode11")
+                    .tag("statusCode2", "statusCode2")
+                    .tag("statusCode3", "statusCode3")
+                    .tag("statusCode4", "statusCode4")
+                    .tag("statusCode5", "statusCode5")
+                    .tag("statusCode6", "statusCode6")
+                    .build();
+            String lineProtocol=point.lineProtocol();
+            lineProtocolList.add(lineProtocol);
+        }
+        //
+
+        InfluxDBUtil.batchInsert("db-test", new InfluxDBUtil.InfluxDBBatchInsertCallback() {
+            @Override
+            public void doCallBack(String database, InfluxDB influxDB) {
+                influxDB.write(lineProtocolList);
+            }
+        });
+    }
+
+    /**
+     * Pkg的作用主要是用于防止influxdb,批量导入数据丢失问题
+     */
+    @Test
+    @PerfTest(threads = 20, invocations = 10)
+    public void batchInsert_getPkg(){
+        for (int j = 0; j <1000000 ; j++) {
+            DataRepository.PRODUCT.incrementAndGet();
+        }
+        DataRepository.PRODUCT.printTest();
+    }
+
 
 }

@@ -52,7 +52,7 @@ public class InfluxDBUtil4BatchInsertTest {
             InfluxdbEntiy item= InfluxdbEntiy.build()
                     //pkg=保证批量数据全部插入到数据库
                     //批量数据导入:必须设置addTage("pkg",i+"")，才可以保证数据全部插入，否则数据会有遗漏
-                    .addTage("pkg",i+"")
+                    .addTage("pkg",DataRepository.PRODUCT.incrementAndGet()+"")
                     .addTage("t1","t1")
                     .addTage("t2","t2")
                     .addField("f1",1)

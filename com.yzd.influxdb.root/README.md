@@ -24,9 +24,20 @@ Java并发包中的阻塞队列一共7个，当然他们都是线程安全的。
 > 解决批量插入中因使用阻塞队列take而产生大量线程驻留问题
 - InfluxDBUtilTest.batchInsertByBlockingQueue2
 
+### InfluxDB 插入数据 “数据丢失”
 > 问题二：如何保证批量数据全部插入到数据库-避免数据丢失-addTage("pkg",i+"")
 ```
 批量数据导入必须设置addTage("pkg",i+"")，才可以保证数据全部插入，否则数据会有遗漏
+Pkg的作用主要是用于防止influxdb,批量导入数据丢失问题
+------
+数据丢失问题的原因：
+influxdb 插入数据格式为 insert measurement,tag=value field=value timestamp
+是按照时间存储的
+对于 measurement tagkey, tagvalue 和 timestamp 一样的，field 会被最新的值替换
+（可以理解为“更新”操作）
+------
+解决方案：
+DataRepository.incrementAndGet
 ```
 > 问题三：[解决retrofit OKhttp创建大量对外连接时内存溢出](https://blog.csdn.net/tianyaleixiaowu/article/details/78811488)
 ```

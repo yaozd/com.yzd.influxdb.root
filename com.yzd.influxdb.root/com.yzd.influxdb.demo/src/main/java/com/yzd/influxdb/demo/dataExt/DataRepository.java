@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
 public enum DataRepository {
@@ -93,4 +94,33 @@ public enum DataRepository {
         }
         return data;
     }
+    //region Pkg的作用主要是用于防止influxdb,批量导入数据丢失问题
+    //Pkg的作用主要是用于防止influxdb,批量导入数据丢失问题
+    AtomicInteger pkgId = new AtomicInteger(0);
+    //目前暂定1万的pkg
+    int maxPkgId=10000;
+    /**
+     * pkgId到达最大值maxPkgId后重置pkgId为零。
+     * synchronized作用：AtomicInteger实现边界值控制
+     * @return
+     */
+    public synchronized int incrementAndGet() {
+        int value= pkgId.incrementAndGet();
+        if(value>maxPkgId){
+            pkgId.set(0);
+            value=pkgId.incrementAndGet();
+            //pkgIdResetCount.incrementAndGet();
+        }
+        return value;
+    }
+    //pkg重置的次数。
+    AtomicInteger pkgIdResetCount = new AtomicInteger(0);
+
+    /**
+     * 此方法是验证incrementAndGet的
+     */
+    public void printTest(){
+        System.out.println(pkgIdResetCount.get());
+    }
+    //end
 }
